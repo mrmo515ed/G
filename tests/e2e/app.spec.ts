@@ -41,4 +41,57 @@ test.describe('Anime Black V7 Full System Verification', () => {
     const data = await response.json();
     expect(data.success).toBe(false);
   });
+
+  test('Frontend root serves index.html with Arabic RTL, meta tags, and secure headers', async ({ request }) => {
+    const response = await request.get('/');
+    expect(response.ok()).toBeTruthy();
+    expect(response.status()).toBe(200);
+
+    const headers = response.headers();
+    expect(headers['x-content-type-options']).toBe('nosniff');
+    expect(headers['x-frame-options']).toBe('SAMEORIGIN');
+
+    const html = await response.text();
+    expect(html).toContain('lang="ar" dir="rtl"');
+    expect(html).toContain('<title>Anime Black — أنمي بلاك</title>');
+    expect(html).toContain('name="description" content="شبكة الأوتاكو الشاملة — أنمي، مانجا، مجتمعات، ألعاب واربح، وقصص في تطبيق واحد"');
+    expect(html).toContain('name="viewport"');
+    expect(html).toContain('/dist/anime-black-core.umd.cjs');
+    expect(html).toContain('/rtm.js');
+    expect(html).toContain('manifest.json');
+  });
+
+  test('All core production assets, bundles, and PWA files are served successfully', async ({ request }) => {
+    const coreBundle = await request.get('/dist/anime-black-core.umd.cjs');
+    expect(coreBundle.ok()).toBeTruthy();
+    expect(coreBundle.status()).toBe(200);
+
+    const rtm = await request.get('/rtm.js');
+    expect(rtm.ok()).toBeTruthy();
+    expect(rtm.status()).toBe(200);
+
+    const manifest = await request.get('/manifest.json');
+    expect(manifest.ok()).toBeTruthy();
+    const manifestJson = await manifest.json();
+    expect(manifestJson.name).toBe('Anime Black — أنمي بلاك');
+    expect(manifestJson.start_url).toBe('/?source=pwa');
+
+    const sw = await request.get('/sw.js');
+    expect(sw.ok()).toBeTruthy();
+    expect(sw.status()).toBe(200);
+
+    const iconSvg = await request.get('/icon.svg');
+    expect(iconSvg.ok()).toBeTruthy();
+    expect(iconSvg.status()).toBe(200);
+  });
+
+  test('SPA routing fallback correctly serves index.html for direct sub-routes', async ({ request }) => {
+    const deepRoute = await request.get('/worlds/anime-zone');
+    expect(deepRoute.ok()).toBeTruthy();
+    expect(deepRoute.status()).toBe(200);
+    const html = await deepRoute.text();
+    expect(html).toContain('<title>Anime Black — أنمي بلاك</title>');
+  });
 });
+
+

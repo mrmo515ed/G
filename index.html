@@ -22,13 +22,13 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Anime Black">
 <meta property="og:title" content="Anime Black — أنمي بلاك">
-<meta property="og:description" content="شبكة الأوتاكو الشاملة — أنمي، مانجا، مجتمعات، وقصص في تطبيق واحد">
+<meta property="og:description" content="شبكة الأوتاكو الشاملة — أنمي، مانجا، مجتمعات، ألعاب واربح، وقصص في تطبيق واحد">
 <meta property="og:locale" content="ar_AR">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Anime Black — أنمي بلاك">
-<meta name="twitter:description" content="شبكة الأوتاكو الشاملة — أنمي، مانجا، مجتمعات، وقصص في تطبيق واحد">
+<meta name="twitter:description" content="شبكة الأوتاكو الشاملة — أنمي، مانجا، مجتمعات، ألعاب واربح، وقصص في تطبيق واحد">
 <title>Anime Black — أنمي بلاك</title>
-<meta name="description" content="شبكة الأوتاكو الشاملة — أنمي، مانجا، مجتمعات، وقصص في تطبيق واحد">
+<meta name="description" content="شبكة الأوتاكو الشاملة — أنمي، مانجا، مجتمعات، ألعاب واربح، وقصص في تطبيق واحد">
 <script src="/dist/anime-black-core.umd.cjs"></script>
 <script type="module" src="/rtm.js"></script>
 <style>
@@ -3017,8 +3017,9 @@ function syncUserStateToServer(immediate = false){
   // - تسوية الاتجاه: السيرفر مصدر الحقيقة — لا نكتب حالة محلية قديمة فوق حالة سيرفر أحدث
   if(!window.db || !window.doc || !window.setDoc) return Promise.resolve({success:false, skipped:true, reason:"no-firestore", operations:[]});
   if(!window.RTSM && typeof window.ensureRTSM === "function") window.ensureRTSM();
-  const targetUid = (window.auth && window.auth.currentUser && window.auth.currentUser.uid) || getMyUid();
-  if(!targetUid || targetUid === "me" || targetUid === "guest" || targetUid === "anon" || String(targetUid).startsWith("temp_")) return Promise.resolve({success:false, skipped:true, reason:"no-uid", operations:[]});
+  const authUser = window.auth && window.auth.currentUser;
+  if (!authUser || !authUser.uid) return Promise.resolve({success:false, skipped:true, reason:"unauthenticated", operations:[]});
+  const targetUid = authUser.uid;
 
   const decideDir = (window.RealtimeSyncManager && window.RealtimeSyncManager.decideSyncDirection)
     ? window.RealtimeSyncManager.decideSyncDirection
@@ -3123,8 +3124,8 @@ function syncUserStateToServer(immediate = false){
       let serverProfileExists = null;
       try {
         const [stateSnap, userSnap] = await Promise.all([
-          (window.getDocFromServer ? window.getDocFromServer(stateRef) : window.getDoc(stateRef)).catch(() => (window.getDoc ? window.getDoc(stateRef).catch(()=>null) : null)),
-          (window.getDocFromServer ? window.getDocFromServer(userRef) : window.getDoc(userRef)).catch(() => (window.getDoc ? window.getDoc(userRef).catch(()=>null) : null))
+          (window.getDoc ? window.getDoc(stateRef).catch(()=>null) : null),
+          (window.getDoc ? window.getDoc(userRef).catch(()=>null) : null)
         ]);
 
         serverStateExists = !!(stateSnap && stateSnap.exists && (typeof stateSnap.exists === "function" ? stateSnap.exists() : stateSnap.exists));
@@ -3225,15 +3226,8 @@ async function fetchAndHydrateUserState(uid, forceServer = true){
     const userRef = window.doc(window.db, "users", uid);
     const stateRef = window.doc(window.db, "user_states", uid);
     
-    // سحب مباشر من سيرفر Firestore دائماً لمنع كاش Firestore القديم من استبدال البيانات
+    // سحب آمن مع كاش متوافق مع الاتصال أوفلاين وأونلاين
     const fetchDocSafe = async (ref) => {
-      if (forceServer && window.getDocFromServer) {
-        try {
-          return await window.getDocFromServer(ref);
-        } catch(serverErr) {
-          console.warn("[sync] getDocFromServer failed for " + ((ref && ref.path) || "ref") + ", trying cache getDoc:", serverErr);
-        }
-      }
       return await (window.getDoc ? window.getDoc(ref).catch(()=>null) : null);
     };
 
@@ -23978,6 +23972,11 @@ boot();
 
   function handleFirestoreError(error, operationType, path) {
     const errMessage = error instanceof Error ? error.message : String(error || '');
+    const isPermError = /permission|insufficient/i.test(errMessage) || (error && error.code === 'permission-denied');
+    if (!isPermError) {
+      console.warn('[Firestore] Non-permission notice (' + operationType + ' ' + (path || '') + '):', errMessage);
+      return;
+    }
     const errInfo = {
       error: errMessage,
       authInfo: {
@@ -23994,7 +23993,8 @@ boot();
       operationType: operationType,
       path: path
     };
-    console.warn('Firestore Operation Note:', JSON.stringify(errInfo));
+    console.error('Firestore Error: ', JSON.stringify(errInfo));
+    throw new Error(JSON.stringify(errInfo));
   }
   window.handleFirestoreError = handleFirestoreError;
 
@@ -24903,14 +24903,7 @@ if (window.auth && window.auth.currentUser) {
       // 2. Fetch or Create user profile + User state (السيرفر مصدر الحقيقة — الأولوية لـ getDocFromServer)
       const userRef = window.doc(window.db, "users", user.uid);
       const getLatestUserDoc = async () => {
-        if (window.getDocFromServer) {
-          try {
-            return await window.getDocFromServer(userRef);
-          } catch(e) {
-            console.warn("[auth] getDocFromServer failed, trying getDoc:", e);
-          }
-        }
-        return await (window.getDoc ? window.getDoc(userRef) : null);
+        return await (window.getDoc ? window.getDoc(userRef).catch(()=>null) : null);
       };
 
       getLatestUserDoc().then(async (docSnap) => {

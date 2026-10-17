@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node server.js",
     "start": "node server.js",
-    "build": "vite build && mkdir -p dist && cp index.html server.js rtm.js manifest.json sw.js pwa-192x192.png pwa-512x512.png apple-touch-icon.png icon.svg firebase-applet-config.json dist/ 2>/dev/null || true",
+    "build": "vite build && mkdir -p dist && cp index.html server.js rtm.js manifest.json sw.js pwa-192x192.png pwa-512x512.png apple-touch-icon.png icon.svg firebase-applet-config.json package.json dist/ 2>/dev/null || true",
     "lint": "eslint src/ server.js tests/ rtm.js",
     "test": "vitest run",
     "test:e2e": "playwright test",

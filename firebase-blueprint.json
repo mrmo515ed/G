@@ -101,6 +101,19 @@
         "ok": { "type": "boolean" }
       }
     },
+    "Rating": {
+      "title": "Rating",
+      "description": "User content and anime star ratings",
+      "type": "object",
+      "properties": {
+        "targetId": { "type": "string" },
+        "type": { "type": "string" },
+        "userId": { "type": "string" },
+        "stars": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["targetId", "userId", "stars"]
+    },
     "World": {
       "title": "World",
       "description": "Anime World channel and messages",
@@ -279,6 +292,10 @@
     "/level_mappings/{mappingId}": {
       "schema": "LevelMapping",
       "description": "Level badge mappings configuration"
+    },
+    "/ratings/{ratingId}": {
+      "schema": "Rating",
+      "description": "User anime and content star ratings"
     }
   }
 }

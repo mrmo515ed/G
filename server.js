@@ -415,7 +415,11 @@ app.get("/api/admin/metrics", (req, res) => {
   });
 });
 
-// Serve static frontend files
+// Serve static frontend files with multi-context fallback (root and dist)
+if (fs.existsSync(join(__dirname, "dist"))) {
+  app.use("/dist", express.static(join(__dirname, "dist"), { maxAge: "1d" }));
+}
+app.use("/dist", express.static(__dirname, { maxAge: "1d" }));
 app.use(express.static(__dirname, {
   maxAge: "1d",
   index: "index.html",
@@ -430,7 +434,15 @@ app.use((err, req, res, next) => {
 
 // Fallback to index.html for SPA-style routes
 app.use((req, res) => {
-  res.sendFile(join(__dirname, "index.html"));
+  const rootIndex = join(__dirname, "index.html");
+  const distIndex = join(__dirname, "dist", "index.html");
+  if (fs.existsSync(rootIndex)) {
+    return res.sendFile(rootIndex);
+  }
+  if (fs.existsSync(distIndex)) {
+    return res.sendFile(distIndex);
+  }
+  res.status(404).send("Anime Black — Entry point not found");
 });
 
 app.listen(PORT, "0.0.0.0", () => {

@@ -151,9 +151,19 @@ service cloud.firestore {
 
     // Active login sessions
     match /sessions/{sessionId} {
-      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
-      allow create: if isSignedIn() && incoming().userId == request.auth.uid;
-      allow update, delete: if isSignedIn() && (existing().userId == request.auth.uid || isAdmin());
+      allow read: if isSignedIn() && (
+        (resource != null && resource.data.get('userId', '') == request.auth.uid) ||
+        isAdmin()
+      );
+      allow write: if isSignedIn() && (
+        incoming().get('userId', request.auth.uid) == request.auth.uid ||
+        (resource != null && resource.data.get('userId', '') == request.auth.uid) ||
+        isAdmin()
+      );
+      allow delete: if isSignedIn() && (
+        (resource != null && resource.data.get('userId', '') == request.auth.uid) ||
+        isAdmin()
+      );
     }
 
     // ============================================================
@@ -265,9 +275,7 @@ service cloud.firestore {
       function isGroupPrivate() { return groupDoc().get('privacy', 'عام') == 'خاص'; }
       function hasMemberUids() { return 'memberUids' in groupDoc(); }
 
-      allow read: if isSignedIn() && (
-        isAdmin() || isMod() || !isGroupPrivate() || isGroupMember() || isGroupOwner()
-      );
+      allow read: if true;
 
       allow create: if isSignedIn() && (
         incoming().get('creatorUid', incoming().get('creatorId', request.auth.uid)) == request.auth.uid ||
@@ -408,6 +416,21 @@ service cloud.firestore {
     }
 
     // ============================================================
+    // Ratings & Reviews
+    // ============================================================
+    match /ratings/{ratingId} {
+      allow read: if true;
+      allow create, update: if isSignedIn() && (
+        incoming().get('userId', request.auth.uid) == request.auth.uid ||
+        isAdmin()
+      );
+      allow delete: if isSignedIn() && (
+        existing().get('userId', request.auth.uid) == request.auth.uid ||
+        isAdmin()
+      );
+    }
+
+    // ============================================================
     // Design System, Badges, Economy & Administration
     // ============================================================
     match /app_visual_config/{configId} {
@@ -518,7 +541,8 @@ service cloud.firestore {
 
     match /game_anti_cheat_logs/{logId} {
       allow read: if isMod() || isAdmin();
-      allow write: if isAdmin();
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
     }
 
     // سجلات التدقيق ليست خاضعة لسلطة العميل — أدمن فقط
