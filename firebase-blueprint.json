@@ -205,6 +205,10 @@
       "schema": "Session",
       "description": "User active login sessions"
     },
+    "/users/{userId}/sessions/{sessionId}": {
+      "schema": "Session",
+      "description": "User active login sessions subcollection"
+    },
     "/chat_requests/{requestId}": {
       "schema": "ChatRequest",
       "description": "Direct message connection requests"

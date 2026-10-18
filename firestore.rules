@@ -48,7 +48,7 @@ service cloud.firestore {
       return isAdmin() || (
         isSignedIn() &&
         exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') in ['Moderator', 'SeniorModerator', 'SuperAdministrator'])
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') in ['Moderator', 'SeniorModerator', 'SuperAdministrator']
       );
     }
 
@@ -611,7 +611,7 @@ service cloud.firestore {
 
     // مفاتيح منع الإعادة (idempotency) — يكتبها السيرفر فقط
     match /economy_idempotency/{keyId} {
-      allow read: if isSignedIn() && keyId.matches('^' + request.auth.uid + '.*');
+      allow read: if isSignedIn() && (isAdmin() || resource.data.get('uid', '') == request.auth.uid);
       allow write: if false;
     }
   }

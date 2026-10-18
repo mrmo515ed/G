@@ -25018,7 +25018,7 @@ if (window.auth && window.auth.currentUser) {
               sessionId = "sess_" + Math.random().toString(36).substr(2, 9) + Date.now();
               sessionStorage.setItem("animeblack_session_id", sessionId);
           }
-          const sessionRef = window.doc(window.db, "sessions", sessionId);
+          const sessionRef = window.doc(window.db, "users", user.uid, "sessions", sessionId);
           window.setDoc(sessionRef, {
               sessionId: sessionId,
               userId: user.uid,
