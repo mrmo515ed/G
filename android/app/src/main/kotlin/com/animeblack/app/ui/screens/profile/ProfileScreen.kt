@@ -24,7 +24,10 @@ import com.animeblack.app.ui.theme.*
 
 @Composable
 fun ProfileScreen(
-    firebaseRepository: FirebaseRepository
+    firebaseRepository: FirebaseRepository,
+    onSettingsClick: () -> Unit = {},
+    onLibraryClick: () -> Unit = {},
+    onNotificationsClick: () -> Unit = {}
 ) {
     val uid = firebaseRepository.currentUserId ?: "guest"
     var userProfile by remember { mutableStateOf<User?>(null) }
@@ -213,13 +216,14 @@ fun ProfileScreen(
         }
 
         items(listOf(
-            Pair("سجل المشاهدات والمفضلة", Icons.Default.History),
-            Pair("إدارة الإشعارات وتنبيهات الحلقات", Icons.Default.Notifications),
-            Pair("الأجهزة والجلسات النشطة", Icons.Default.Devices),
-            Pair("سياسة الخصوصية وشروط الاستخدام", Icons.Default.Security)
-        )) { (label, icon) ->
+            Triple("سجل المشاهدات والمفضلة", Icons.Default.History, onLibraryClick),
+            Triple("إدارة الإشعارات وتنبيهات الحلقات", Icons.Default.Notifications, onNotificationsClick),
+            Triple("إعدادات التطبيق والحساب", Icons.Default.Settings, onSettingsClick),
+            Triple("الأجهزة والجلسات النشطة", Icons.Default.Devices, onSettingsClick)
+        )) { (label, icon, onClickAction) ->
             GlassCard(
                 cornerRadius = Dimensions.radiusMd,
+                onClick = onClickAction,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = Dimensions.spaceXs)

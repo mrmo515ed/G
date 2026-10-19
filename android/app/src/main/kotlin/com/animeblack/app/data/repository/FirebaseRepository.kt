@@ -138,4 +138,132 @@ class FirebaseRepository {
             // Log locally without crashing
         }
     }
+
+    // Authentication Methods
+    suspend fun signInWithEmail(email: String, pass: String): Result<String> {
+        return try {
+            val res = auth.signInWithEmailAndPassword(email, pass).await()
+            val uid = res.user?.uid ?: throw IllegalStateException("User ID is null")
+            Result.success(uid)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun signUpWithEmail(email: String, pass: String, displayName: String): Result<String> {
+        return try {
+            val res = auth.createUserWithEmailAndPassword(email, pass).await()
+            val uid = res.user?.uid ?: throw IllegalStateException("User ID is null")
+            val userProfile = hashMapOf(
+                "uid" to uid,
+                "email" to email,
+                "name" to displayName,
+                "username" to displayName.lowercase().replace(" ", "_"),
+                "avatar" to "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=200",
+                "role" to "Member",
+                "level" to 1,
+                "coins" to 100,
+                "stars" to 10,
+                "joined" to System.currentTimeMillis()
+            )
+            firestore.collection("users").document(uid).set(userProfile).await()
+            Result.success(uid)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun signInAnonymously(): Result<String> {
+        return try {
+            val res = auth.signInAnonymously().await()
+            val uid = res.user?.uid ?: throw IllegalStateException("User ID is null")
+            Result.success(uid)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    fun signOut() {
+        auth.signOut()
+    }
+
+    // Notifications Flow
+    fun observeNotifications(userId: String): Flow<List<NotificationItem>> = callbackFlow {
+        val listener = firestore.collection("notifications")
+            .whereEqualTo("userId", userId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    trySend(emptyList())
+                    return@addSnapshotListener
+                }
+                val items = snapshot?.documents?.mapNotNull { it.toObject(NotificationItem::class.java) } ?: emptyList()
+                trySend(items)
+            }
+        awaitClose { listener.remove() }
+    }
+
+    suspend fun markNotificationRead(notifId: String) {
+        try {
+            firestore.collection("notifications").document(notifId).update("isRead", true).await()
+        } catch (_: Exception) {}
+    }
+
+    // Favorites & Library Flow
+    fun observeFavorites(userId: String): Flow<List<String>> = callbackFlow {
+        val listener = firestore.collection("users").document(userId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    trySend(emptyList())
+                    return@addSnapshotListener
+                }
+                val favs = (snapshot?.get("favorites") as? List<*>)?.filterIsInstance<String>() ?: emptyList()
+                trySend(favs)
+            }
+        awaitClose { listener.remove() }
+    }
+
+    suspend fun toggleFavorite(userId: String, animeId: String): Result<Boolean> {
+        return try {
+            val userRef = firestore.collection("users").document(userId)
+            var isAdded = false
+            firestore.runTransaction { tx ->
+                val snap = tx.get(userRef)
+                val favs = (snap.get("favorites") as? List<*>)?.filterIsInstance<String>()?.toMutableList() ?: mutableListOf()
+                if (favs.contains(animeId)) {
+                    favs.remove(animeId)
+                    isAdded = false
+                } else {
+                    favs.add(animeId)
+                    isAdded = true
+                }
+                tx.update(userRef, "favorites", favs)
+            }.await()
+            Result.success(isAdded)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    // Watch History
+    suspend fun saveWatchProgress(userId: String, item: WatchHistoryItem) {
+        try {
+            firestore.collection("users").document(userId)
+                .collection("history").document(item.animeId)
+                .set(item).await()
+        } catch (_: Exception) {}
+    }
+
+    fun observeWatchHistory(userId: String): Flow<List<WatchHistoryItem>> = callbackFlow {
+        val listener = firestore.collection("users").document(userId)
+            .collection("history")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    trySend(emptyList())
+                    return@addSnapshotListener
+                }
+                val items = snapshot?.documents?.mapNotNull { it.toObject(WatchHistoryItem::class.java) } ?: emptyList()
+                trySend(items)
+            }
+        awaitClose { listener.remove() }
+    }
 }

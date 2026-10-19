@@ -201,3 +201,15 @@ data class Rating(
     val review: String = "",
     val createdAt: Long = System.currentTimeMillis()
 )
+
+data class NotificationItem(
+    val id: String = "",
+    val userId: String = "",
+    val title: String = "",
+    val body: String = "",
+    val type: String = "episode",
+    val targetId: String = "",
+    val isRead: Boolean = false,
+    val createdAt: Long = System.currentTimeMillis()
+)
+

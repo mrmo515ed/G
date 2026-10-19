@@ -35,7 +35,9 @@ import kotlinx.coroutines.launch
 fun HomeScreen(
     animeRepository: AnimeRepository,
     onAnimeClick: (String) -> Unit = {},
-    onEpisodeClick: (String, String) -> Unit = { _, _ -> }
+    onEpisodeClick: (String, String) -> Unit = { _, _ -> },
+    onNotificationsClick: () -> Unit = {},
+    onLibraryClick: () -> Unit = {}
 ) {
     var animeList by remember { mutableStateOf<List<Anime>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
@@ -110,7 +112,13 @@ fun HomeScreen(
                         Icon(Icons.Default.Search, contentDescription = "بحث الذكاء الاصطناعي", tint = TextPrimary)
                     }
                     IconButton(
-                        onClick = {},
+                        onClick = onLibraryClick,
+                        modifier = Modifier.size(Dimensions.iconButtonSize)
+                    ) {
+                        Icon(Icons.Default.VideoLibrary, contentDescription = "مكتبتي", tint = TextPrimary)
+                    }
+                    IconButton(
+                        onClick = onNotificationsClick,
                         modifier = Modifier.size(Dimensions.iconButtonSize)
                     ) {
                         Icon(Icons.Default.Notifications, contentDescription = "تنبيهات", tint = TextPrimary)
