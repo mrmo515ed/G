@@ -1,7 +1,6 @@
 package com.animeblack.app.ui.screens.chat
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -45,29 +44,29 @@ fun ChatScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(DarkBg)
+            .background(AmoledBlack)
     ) {
         // Chat Top Bar
         Surface(
-            color = DarkSurface,
+            color = DarkCharcoal,
             modifier = Modifier.fillMaxWidth()
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                    .padding(horizontal = Dimensions.spaceLg, vertical = Dimensions.spaceMd),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
                     modifier = Modifier
                         .size(42.dp)
                         .clip(CircleShape)
-                        .background(AccentRed),
+                        .background(GradCyberBlue),
                     contentAlignment = Alignment.Center
                 ) {
                     Text("⚔️", fontSize = 20.sp)
                 }
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(Dimensions.spaceMd))
                 Column {
                     Text(
                         text = "غرفة محادثة الأوتاكو العامة",
@@ -77,8 +76,9 @@ fun ChatScreen(
                     )
                     Text(
                         text = "متصلون الآن · نقاشات الأنمي والموسم الجديد",
-                        color = AccentEmerald,
-                        fontSize = 11.sp
+                        color = StatusSuccess,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Medium
                     )
                 }
             }
@@ -89,7 +89,7 @@ fun ChatScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .padding(horizontal = Dimensions.spaceLg, vertical = Dimensions.spaceSm),
             reverseLayout = false
         ) {
             items(messages) { msg ->
@@ -97,7 +97,7 @@ fun ChatScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 4.dp),
+                        .padding(vertical = Dimensions.spaceXs),
                     horizontalArrangement = if (isMe) Arrangement.End else Arrangement.Start
                 ) {
                     if (!isMe) {
@@ -106,10 +106,10 @@ fun ChatScreen(
                             contentDescription = msg.senderName,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
-                                .size(32.dp)
+                                .size(Dimensions.avatarSm)
                                 .clip(CircleShape)
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(Dimensions.spaceSm))
                     }
 
                     Column(
@@ -118,26 +118,27 @@ fun ChatScreen(
                         if (!isMe) {
                             Text(
                                 text = msg.senderName,
-                                color = AccentGold,
+                                color = CyberBlue,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold
                             )
                         }
                         Surface(
                             shape = RoundedCornerShape(
-                                topStart = 12.dp,
-                                topEnd = 12.dp,
-                                bottomStart = if (isMe) 12.dp else 2.dp,
-                                bottomEnd = if (isMe) 2.dp else 12.dp
+                                topStart = Dimensions.radiusMd,
+                                topEnd = Dimensions.radiusMd,
+                                bottomStart = if (isMe) Dimensions.radiusMd else Dimensions.space2xs,
+                                bottomEnd = if (isMe) Dimensions.space2xs else Dimensions.radiusMd
                             ),
-                            color = if (isMe) AccentRed else DarkCard,
+                            color = if (isMe) CyberBlue else DarkSlate,
                             modifier = Modifier.widthIn(max = 280.dp)
                         ) {
                             Text(
                                 text = msg.text,
-                                color = Color.White,
+                                color = if (isMe) AmoledBlack else TextPrimary,
                                 fontSize = 13.sp,
-                                modifier = Modifier.padding(10.dp)
+                                fontWeight = if (isMe) FontWeight.SemiBold else FontWeight.Normal,
+                                modifier = Modifier.padding(Dimensions.spaceMd)
                             )
                         }
                     }
@@ -147,13 +148,13 @@ fun ChatScreen(
 
         // Bottom Input Row
         Surface(
-            color = DarkSurface,
+            color = DarkCharcoal,
             modifier = Modifier.fillMaxWidth()
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                    .padding(horizontal = Dimensions.spaceMd, vertical = Dimensions.spaceSm),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 OutlinedTextField(
@@ -162,14 +163,14 @@ fun ChatScreen(
                     placeholder = { Text("اكتب رسالتك هنا...", color = TextMuted, fontSize = 13.sp) },
                     modifier = Modifier
                         .weight(1f)
-                        .padding(end = 8.dp),
+                        .padding(end = Dimensions.spaceSm),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedTextColor = TextPrimary,
                         unfocusedTextColor = TextPrimary,
-                        focusedBorderColor = AccentRed,
-                        unfocusedBorderColor = BorderSubtle
+                        focusedBorderColor = CyberBlue,
+                        unfocusedBorderColor = DarkBorder
                     ),
-                    shape = RoundedCornerShape(24.dp),
+                    shape = RoundedCornerShape(Dimensions.radiusFull),
                     maxLines = 4
                 )
 
@@ -184,7 +185,6 @@ fun ChatScreen(
                                 text = messageText.trim(),
                                 timestamp = System.currentTimeMillis()
                             )
-                            val textToSend = messageText
                             messageText = ""
                             coroutineScope.launch {
                                 firebaseRepository.sendMessage(groupId, newMsg)
@@ -192,10 +192,15 @@ fun ChatScreen(
                         }
                     },
                     modifier = Modifier
-                        .size(44.dp)
-                        .background(AccentRed, CircleShape)
+                        .size(Dimensions.buttonHeight)
+                        .background(CyberBlue, CircleShape)
                 ) {
-                    Icon(Icons.Default.Send, contentDescription = "إرسال", tint = Color.White, modifier = Modifier.size(20.dp))
+                    Icon(
+                        Icons.Default.Send,
+                        contentDescription = "إرسال",
+                        tint = AmoledBlack,
+                        modifier = Modifier.size(20.dp)
+                    )
                 }
             }
         }

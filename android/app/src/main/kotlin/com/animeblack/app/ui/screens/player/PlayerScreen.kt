@@ -19,6 +19,8 @@ import androidx.compose.ui.unit.sp
 import com.animeblack.app.data.model.Episode
 import com.animeblack.app.data.repository.AnimeRepository
 import com.animeblack.app.player.AnimePlayerView
+import com.animeblack.app.ui.components.GlassCard
+import com.animeblack.app.ui.components.OtakuBadge
 import com.animeblack.app.ui.theme.*
 
 @Composable
@@ -43,7 +45,7 @@ fun PlayerScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(DarkBg)
+            .background(AmoledBlack)
     ) {
         // ExoPlayer Video View
         if (currentEpisode != null && currentStreamUrl.isNotEmpty()) {
@@ -65,7 +67,7 @@ fun PlayerScreen(
                     .background(Color.Black),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = AccentRed)
+                CircularProgressIndicator(color = CyberBlue)
             }
         }
 
@@ -74,7 +76,7 @@ fun PlayerScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .padding(16.dp)
+                .padding(Dimensions.spaceLg)
         ) {
             item {
                 Text(
@@ -83,65 +85,78 @@ fun PlayerScreen(
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(Dimensions.spaceXs))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = "الحلقة ${currentEpisode?.number ?: 1}: ${currentEpisode?.title ?: ""}",
-                        color = AccentGold,
+                        color = CyberBlue,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(Dimensions.spaceSm))
                     Text(
                         text = "· ${currentEpisode?.duration ?: "24:00"}",
                         color = TextSecondary,
                         fontSize = 12.sp
+                    )
                 }
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(Dimensions.spaceSm))
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(vertical = 2.dp)
+                    modifier = Modifier.padding(vertical = Dimensions.space2xs)
                 ) {
                     Icon(
                         Icons.Default.CloudDone,
                         contentDescription = "كاش أوفلاين نشط",
-                        tint = AccentEmerald,
+                        tint = StatusSuccess,
                         modifier = Modifier.size(16.dp)
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
+                    Spacer(modifier = Modifier.width(Dimensions.spaceSm))
                     Text(
                         text = "محفوظ في الكاش التلقائي للمشاهدة بدون إنترنت",
-                        color = AccentEmerald,
+                        color = StatusSuccess,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Medium
                     )
                 }
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(Dimensions.spaceLg))
 
                 // Actions row (Like, Save, Share)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
-                    IconButton(onClick = {}) {
+                    IconButton(
+                        onClick = {},
+                        modifier = Modifier.size(Dimensions.iconButtonSize)
+                    ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Icon(Icons.Default.ThumbUp, contentDescription = "إعجاب", tint = TextPrimary)
                             Text("إعجاب", color = TextSecondary, fontSize = 11.sp)
                         }
                     }
-                    IconButton(onClick = {}) {
+                    IconButton(
+                        onClick = {},
+                        modifier = Modifier.size(Dimensions.iconButtonSize)
+                    ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Icon(Icons.Default.Bookmark, contentDescription = "حفظ", tint = TextPrimary)
                             Text("قائمتي", color = TextSecondary, fontSize = 11.sp)
                         }
                     }
-                    IconButton(onClick = {}) {
+                    IconButton(
+                        onClick = {},
+                        modifier = Modifier.size(Dimensions.iconButtonSize)
+                    ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Icon(Icons.Default.Share, contentDescription = "مشاركة", tint = TextPrimary)
                             Text("مشاركة", color = TextSecondary, fontSize = 11.sp)
                         }
                     }
-                    IconButton(onClick = {}) {
+                    IconButton(
+                        onClick = {},
+                        modifier = Modifier.size(Dimensions.iconButtonSize)
+                    ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Icon(Icons.Default.Download, contentDescription = "تحميل", tint = TextPrimary)
                             Text("تحميل", color = TextSecondary, fontSize = 11.sp)
@@ -149,39 +164,37 @@ fun PlayerScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(Dimensions.spaceXl))
                 Text(
                     text = "جميع الحلقات (${anime?.episodes?.size ?: 0})",
                     color = TextPrimary,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(Dimensions.spaceSm))
             }
 
             // Episode List
             items(anime?.episodes ?: emptyList()) { ep ->
                 val isCurrent = ep.id == currentEpisode?.id
-                Surface(
-                    shape = RoundedCornerShape(10.dp),
-                    color = if (isCurrent) AccentRed.copy(alpha = 0.15f) else DarkCard,
-                    border = if (isCurrent) ButtonDefaults.outlinedButtonBorder else null,
+                GlassCard(
+                    cornerRadius = Dimensions.radiusMd,
+                    borderAlpha = if (isCurrent) 0.4f else 0.12f,
+                    onClick = {
+                        currentEpisodeId = ep.id
+                        currentStreamUrl = ep.defaultUrl
+                        onSelectEpisode(ep.id)
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                        .clickable {
-                            currentEpisodeId = ep.id
-                            currentStreamUrl = ep.defaultUrl
-                            onSelectEpisode(ep.id)
-                        }
+                        .padding(vertical = Dimensions.spaceXs)
                 ) {
                     Row(
-                        modifier = Modifier.padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
                             text = "${ep.number}",
-                            color = if (isCurrent) AccentRed else TextSecondary,
+                            color = if (isCurrent) CyberBlue else TextSecondary,
                             fontWeight = FontWeight.Bold,
                             fontSize = 15.sp,
                             modifier = Modifier.width(32.dp)
@@ -189,7 +202,7 @@ fun PlayerScreen(
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = ep.title,
-                                color = if (isCurrent) Color.White else TextPrimary,
+                                color = if (isCurrent) CyberBlue else TextPrimary,
                                 fontSize = 13.sp,
                                 fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Normal
                             )
@@ -200,7 +213,7 @@ fun PlayerScreen(
                             )
                         }
                         if (isCurrent) {
-                            Icon(Icons.Default.PlayCircle, contentDescription = null, tint = AccentRed)
+                            Icon(Icons.Default.PlayCircle, contentDescription = null, tint = CyberBlue)
                         }
                     }
                 }

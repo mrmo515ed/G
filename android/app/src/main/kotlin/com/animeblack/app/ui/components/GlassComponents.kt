@@ -19,45 +19,46 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.animeblack.app.ui.theme.*
 
-// Glassmorphism Card matching website's .card / .card2
+// Glassmorphism Card matching website's dark surfaces
 @Composable
 fun GlassCard(
     modifier: Modifier = Modifier,
-    cornerRadius: Dp = 14.dp,
+    cornerRadius: Dp = Dimensions.radiusLg,
     borderAlpha: Float = 0.12f,
     onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Surface(
         shape = RoundedCornerShape(cornerRadius),
-        color = Color(0xD912141F), // Glassmorphism translucent dark surface
+        color = DarkCharcoal,
         border = BorderStroke(1.dp, Color.White.copy(alpha = borderAlpha)),
         modifier = modifier.then(
             if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier
         )
     ) {
         Column(
-            modifier = Modifier.padding(14.dp),
+            modifier = Modifier.padding(Dimensions.spaceLg),
             content = content
         )
     }
 }
 
-// Neon Gradient Button matching website's btn-primary / grad-fire
+// Official Cyber Blue / Purple Gradient Button
 @Composable
-fun NeonGradientButton(
+fun CyberButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    gradient: Brush = Brush.horizontalGradient(listOf(Color(0xFFFF2A55), Color(0xFFFF7A00))),
+    gradient: Brush = GradCyberBlue,
     icon: (@Composable () -> Unit)? = null
 ) {
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(10.dp))
+            .heightIn(min = Dimensions.minTouchTarget)
+            .clip(RoundedCornerShape(Dimensions.radiusMd))
             .background(gradient)
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 9.dp),
+            .padding(horizontal = Dimensions.spaceXl, vertical = Dimensions.spaceMd),
         contentAlignment = Alignment.Center
     ) {
         Row(
@@ -66,30 +67,30 @@ fun NeonGradientButton(
         ) {
             if (icon != null) {
                 icon()
-                Spacer(modifier = Modifier.width(6.dp))
+                Spacer(modifier = Modifier.width(Dimensions.spaceSm))
             }
             Text(
                 text = text,
-                color = Color.White,
+                color = TextPrimary,
                 fontWeight = FontWeight.Bold,
-                fontSize = 13.sp
+                fontSize = 14.sp
             )
         }
     }
 }
 
-// Otaku Badge matching website's badge / badge b-emerald / b-gold
+// Otaku Badge matching website's badge with glowing accents
 @Composable
 fun OtakuBadge(
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = AccentGold,
+    color: Color = CyberBlue,
     backgroundColor: Color = color.copy(alpha = 0.15f)
 ) {
     Surface(
-        shape = RoundedCornerShape(6.dp),
+        shape = RoundedCornerShape(Dimensions.radiusSm),
         color = backgroundColor,
-        border = BorderStroke(1.dp, color.copy(alpha = 0.35f)),
+        border = BorderStroke(1.dp, color.copy(alpha = 0.4f)),
         modifier = modifier
     ) {
         Text(
@@ -97,7 +98,7 @@ fun OtakuBadge(
             color = color,
             fontSize = 11.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+            modifier = Modifier.padding(horizontal = Dimensions.spaceSm, vertical = Dimensions.space2xs)
         )
     }
 }

@@ -25,6 +25,7 @@ import coil.compose.AsyncImage
 import com.animeblack.app.data.model.Post
 import com.animeblack.app.data.model.Story
 import com.animeblack.app.data.repository.FirebaseRepository
+import com.animeblack.app.ui.components.GlassCard
 import com.animeblack.app.ui.theme.*
 import kotlinx.coroutines.launch
 
@@ -52,14 +53,14 @@ fun CommunityScreen(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(DarkBg)
+            .background(AmoledBlack)
     ) {
         // Community Top Header
         item {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(horizontal = Dimensions.spaceLg, vertical = Dimensions.spaceMd),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -69,8 +70,11 @@ fun CommunityScreen(
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
-                IconButton(onClick = {}) {
-                    Icon(Icons.Default.AddCircle, contentDescription = "منشور جديد", tint = AccentRed)
+                IconButton(
+                    onClick = {},
+                    modifier = Modifier.size(Dimensions.iconButtonSize)
+                ) {
+                    Icon(Icons.Default.AddCircle, contentDescription = "منشور جديد", tint = CyberBlue)
                 }
             }
         }
@@ -79,8 +83,8 @@ fun CommunityScreen(
         item {
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                contentPadding = PaddingValues(horizontal = Dimensions.spaceLg),
+                horizontalArrangement = Arrangement.spacedBy(Dimensions.spaceMd)
             ) {
                 // Add your story button
                 item {
@@ -92,17 +96,17 @@ fun CommunityScreen(
                             modifier = Modifier
                                 .size(64.dp)
                                 .clip(CircleShape)
-                                .background(DarkCard),
+                                .background(DarkSlate),
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(Icons.Default.Add, contentDescription = null, tint = AccentGold)
+                            Icon(Icons.Default.Add, contentDescription = null, tint = CyberBlue)
                         }
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(Dimensions.spaceXs))
                         Text("قصتك", color = TextSecondary, fontSize = 11.sp)
                     }
                 }
 
-                // Community stories
+                // Community stories with Cyber Blue & Electric Purple rings
                 items(stories) { story ->
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -113,7 +117,7 @@ fun CommunityScreen(
                                 .size(64.dp)
                                 .clip(CircleShape)
                                 .background(
-                                    Brush.sweepGradient(listOf(AccentRed, AccentGold, AccentCyan, AccentRed))
+                                    Brush.sweepGradient(listOf(CyberBlue, ElectricPurple, CyberBlueHover, CyberBlue))
                                 )
                                 .padding(2.5.dp)
                         ) {
@@ -126,7 +130,7 @@ fun CommunityScreen(
                                     .clip(CircleShape)
                             )
                         }
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(Dimensions.spaceXs))
                         Text(
                             text = story.userName,
                             color = TextPrimary,
@@ -136,126 +140,133 @@ fun CommunityScreen(
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Dimensions.spaceLg))
         }
 
         // Posts Feed with Glassmorphism
         items(posts) { post ->
             val isLiked = post.likedUsers.contains(currentUserId)
-            com.animeblack.app.ui.components.GlassCard(
-                cornerRadius = 14.dp,
+            GlassCard(
+                cornerRadius = Dimensions.radiusLg,
                 borderAlpha = 0.15f,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 6.dp)
+                    .padding(horizontal = Dimensions.spaceLg, vertical = Dimensions.spaceXs)
             ) {
-                    // Author Row
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        AsyncImage(
-                            model = post.authorAvatar,
-                            contentDescription = post.authorName,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(CircleShape)
-                        )
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Column {
-                            Text(
-                                text = post.authorName,
-                                color = TextPrimary,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 14.sp
-                            )
-                            Text(
-                                text = "منذ قليل",
-                                color = TextMuted,
-                                fontSize = 11.sp
-                            )
-                        }
-                    }
-
-                    // Content
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Text(
-                        text = post.content,
-                        color = TextPrimary,
-                        fontSize = 14.sp,
-                        lineHeight = 20.sp
+                // Author Row
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    AsyncImage(
+                        model = post.authorAvatar,
+                        contentDescription = post.authorName,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(Dimensions.avatarMd)
+                            .clip(CircleShape)
                     )
-
-                    // Post Image if available
-                    if (!post.mediaUrl.isNullOrEmpty()) {
-                        Spacer(modifier = Modifier.height(10.dp))
-                        AsyncImage(
-                            model = post.mediaUrl,
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp)
-                                .clip(RoundedCornerShape(8.dp))
+                    Spacer(modifier = Modifier.width(Dimensions.spaceMd))
+                    Column {
+                        Text(
+                            text = post.authorName,
+                            color = TextPrimary,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp
+                        )
+                        Text(
+                            text = "منذ قليل",
+                            color = TextMuted,
+                            fontSize = 11.sp
                         )
                     }
+                }
 
-                    // Actions Bar (Likes, Comments)
-                    Spacer(modifier = Modifier.height(12.dp))
+                // Content
+                Spacer(modifier = Modifier.height(Dimensions.spaceMd))
+                Text(
+                    text = post.content,
+                    color = TextPrimary,
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp
+                )
+
+                // Post Image if available
+                if (!post.mediaUrl.isNullOrEmpty()) {
+                    Spacer(modifier = Modifier.height(Dimensions.spaceMd))
+                    AsyncImage(
+                        model = post.mediaUrl,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .clip(RoundedCornerShape(Dimensions.radiusSm))
+                    )
+                }
+
+                // Actions Bar (Likes, Comments, Share)
+                Spacer(modifier = Modifier.height(Dimensions.spaceMd))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.clickable {
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .heightIn(min = Dimensions.minTouchTarget)
+                            .clickable {
                                 coroutineScope.launch {
                                     firebaseRepository.toggleLike(post.id, currentUserId)
                                 }
                             }
-                        ) {
-                            Icon(
-                                imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                                contentDescription = "إعجاب",
-                                tint = if (isLiked) AccentRed else TextSecondary,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(
-                                text = "${post.likesCount}",
-                                color = if (isLiked) AccentRed else TextSecondary,
-                                fontSize = 13.sp
-                            )
-                        }
+                    ) {
+                        Icon(
+                            imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                            contentDescription = "إعجاب",
+                            tint = if (isLiked) CyberBlue else TextSecondary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(Dimensions.spaceSm))
+                        Text(
+                            text = "${post.likesCount}",
+                            color = if (isLiked) CyberBlue else TextSecondary,
+                            fontSize = 13.sp,
+                            fontWeight = if (isLiked) FontWeight.Bold else FontWeight.Normal
+                        )
+                    }
 
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.clickable { }
-                        ) {
-                            Icon(
-                                Icons.Default.ChatBubbleOutline,
-                                contentDescription = "تعليق",
-                                tint = TextSecondary,
-                                modifier = Modifier.size(19.dp)
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(
-                                text = "${post.commentsCount}",
-                                color = TextSecondary,
-                                fontSize = 13.sp
-                            )
-                        }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .heightIn(min = Dimensions.minTouchTarget)
+                            .clickable { }
+                    ) {
+                        Icon(
+                            Icons.Default.ChatBubbleOutline,
+                            contentDescription = "تعليق",
+                            tint = TextSecondary,
+                            modifier = Modifier.size(19.dp)
+                        )
+                        Spacer(modifier = Modifier.width(Dimensions.spaceSm))
+                        Text(
+                            text = "${post.commentsCount}",
+                            color = TextSecondary,
+                            fontSize = 13.sp
+                        )
+                    }
 
-                        IconButton(onClick = {}) {
-                            Icon(
-                                Icons.Default.Share,
-                                contentDescription = "مشاركة",
-                                tint = TextSecondary,
-                                modifier = Modifier.size(19.dp)
-                            )
-                        }
+                    IconButton(
+                        onClick = {},
+                        modifier = Modifier.size(Dimensions.iconButtonSize)
+                    ) {
+                        Icon(
+                            Icons.Default.Share,
+                            contentDescription = "مشاركة",
+                            tint = TextSecondary,
+                            modifier = Modifier.size(19.dp)
+                        )
                     }
                 }
             }

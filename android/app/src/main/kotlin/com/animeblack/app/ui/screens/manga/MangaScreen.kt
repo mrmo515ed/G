@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.animeblack.app.data.model.Manga
 import com.animeblack.app.data.model.MangaChapter
+import com.animeblack.app.ui.components.GlassCard
+import com.animeblack.app.ui.components.OtakuBadge
 import com.animeblack.app.ui.theme.*
 
 @Composable
@@ -102,8 +104,8 @@ fun MangaScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(DarkBg)
-                .padding(16.dp)
+                .background(AmoledBlack)
+                .padding(Dimensions.spaceLg)
         ) {
             item {
                 Row(
@@ -111,7 +113,10 @@ fun MangaScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     if (selectedManga != null) {
-                        IconButton(onClick = { selectedManga = null }) {
+                        IconButton(
+                            onClick = { selectedManga = null },
+                            modifier = Modifier.size(Dimensions.iconButtonSize)
+                        ) {
                             Icon(Icons.Default.ArrowBack, contentDescription = "رجوع", tint = TextPrimary)
                         }
                     }
@@ -122,21 +127,21 @@ fun MangaScreen(
                         fontWeight = FontWeight.Bold
                     )
                 }
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(Dimensions.spaceLg))
             }
 
             if (selectedManga == null) {
-                // Manga Catalog List
+                // Manga Catalog List with GlassCard
                 items(sampleManga) { manga ->
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = DarkCard,
+                    GlassCard(
+                        cornerRadius = Dimensions.radiusLg,
+                        borderAlpha = 0.12f,
+                        onClick = { selectedManga = manga },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 6.dp)
-                            .clickable { selectedManga = manga }
+                            .padding(vertical = Dimensions.spaceXs)
                     ) {
-                        Row(modifier = Modifier.padding(12.dp)) {
+                        Row {
                             AsyncImage(
                                 model = manga.cover,
                                 contentDescription = manga.titleAr,
@@ -144,9 +149,9 @@ fun MangaScreen(
                                 modifier = Modifier
                                     .width(80.dp)
                                     .height(115.dp)
-                                    .clip(RoundedCornerShape(8.dp))
+                                    .clip(RoundedCornerShape(Dimensions.radiusSm))
                             )
-                            Spacer(modifier = Modifier.width(12.dp))
+                            Spacer(modifier = Modifier.width(Dimensions.spaceMd))
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = manga.titleAr,
@@ -154,22 +159,27 @@ fun MangaScreen(
                                     fontSize = 15.sp,
                                     fontWeight = FontWeight.Bold
                                 )
-                                Text(
-                                    text = "المؤلف: ${manga.author} · ★ ${manga.score}",
-                                    color = AccentGold,
-                                    fontSize = 12.sp
-                                )
-                                Spacer(modifier = Modifier.height(4.dp))
+                                Spacer(modifier = Modifier.height(Dimensions.space2xs))
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        text = "المؤلف: ${manga.author}",
+                                        color = TextSecondary,
+                                        fontSize = 12.sp
+                                    )
+                                    Spacer(modifier = Modifier.width(Dimensions.spaceSm))
+                                    OtakuBadge(text = "★ ${manga.score}", color = CyberBlue)
+                                }
+                                Spacer(modifier = Modifier.height(Dimensions.spaceXs))
                                 Text(
                                     text = manga.synopsis,
                                     color = TextSecondary,
                                     fontSize = 11.sp,
                                     maxLines = 2
                                 )
-                                Spacer(modifier = Modifier.height(6.dp))
+                                Spacer(modifier = Modifier.height(Dimensions.spaceSm))
                                 Text(
                                     text = "${manga.chaptersCount} فصل · ${manga.status}",
-                                    color = AccentCyan,
+                                    color = ElectricPurpleLight,
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.SemiBold
                                 )
@@ -186,20 +196,21 @@ fun MangaScreen(
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(Dimensions.spaceSm))
                 }
 
                 items(selectedManga!!.chapters) { chapter ->
-                    Surface(
-                        shape = RoundedCornerShape(10.dp),
-                        color = DarkCard,
+                    GlassCard(
+                        cornerRadius = Dimensions.radiusMd,
+                        onClick = { activeChapter = chapter },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                            .clickable { activeChapter = chapter }
+                            .padding(vertical = Dimensions.spaceXs)
                     ) {
                         Row(
-                            modifier = Modifier.padding(14.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(min = Dimensions.minTouchTarget),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -216,7 +227,7 @@ fun MangaScreen(
                                     fontSize = 11.sp
                                 )
                             }
-                            Icon(Icons.Default.MenuBook, contentDescription = "قراءة", tint = AccentRed)
+                            Icon(Icons.Default.MenuBook, contentDescription = "قراءة", tint = CyberBlue)
                         }
                     }
                 }
@@ -257,14 +268,17 @@ fun MangaReaderView(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(Dimensions.spaceLg)
                 .align(Alignment.TopCenter)
-                .background(Color.Black.copy(alpha = 0.6f), RoundedCornerShape(8.dp))
-                .padding(horizontal = 12.dp, vertical = 6.dp),
+                .background(Color.Black.copy(alpha = 0.7f), RoundedCornerShape(Dimensions.radiusSm))
+                .padding(horizontal = Dimensions.spaceMd, vertical = Dimensions.spaceSm),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = onClose) {
+            IconButton(
+                onClick = onClose,
+                modifier = Modifier.size(Dimensions.iconButtonSize)
+            ) {
                 Icon(Icons.Default.Close, contentDescription = "إغلاق", tint = Color.White)
             }
             Text(
@@ -275,8 +289,9 @@ fun MangaReaderView(
             )
             Text(
                 text = "${pagerState.currentPage + 1} / ${chapter.pages.size}",
-                color = AccentGold,
-                fontSize = 12.sp
+                color = CyberBlue,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold
             )
         }
     }

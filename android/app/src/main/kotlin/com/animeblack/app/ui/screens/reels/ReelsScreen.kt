@@ -37,9 +37,7 @@ import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import coil.compose.AsyncImage
 import com.animeblack.app.data.model.Reel
-import com.animeblack.app.ui.theme.AccentGold
-import com.animeblack.app.ui.theme.AccentRed
-import com.animeblack.app.ui.theme.DarkBg
+import com.animeblack.app.ui.theme.*
 
 @OptIn(UnstableApi::class)
 @ExperimentalFoundationApi
@@ -88,7 +86,7 @@ fun ReelsScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(DarkBg)
+            .background(AmoledBlack)
     ) {
         VerticalPager(
             state = pagerState,
@@ -186,7 +184,7 @@ fun ReelPlayerItem(
                 modifier = Modifier
                     .size(46.dp)
                     .clip(CircleShape)
-                    .background(AccentRed)
+                    .background(CyberBlue)
                     .padding(2.dp)
             ) {
                 AsyncImage(
@@ -208,7 +206,7 @@ fun ReelPlayerItem(
                 Icon(
                     imageVector = if (isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                     contentDescription = "إعجاب",
-                    tint = if (isLiked) AccentRed else Color.White,
+                    tint = if (isLiked) CyberBlue else Color.White,
                     modifier = Modifier.size(32.dp)
                 )
                 Text("$likes", color = Color.White, fontSize = 12.sp)
@@ -244,11 +242,11 @@ fun ReelPlayerItem(
                 Spacer(modifier = Modifier.width(8.dp))
                 Surface(
                     shape = CircleShape,
-                    color = AccentRed
+                    color = CyberBlue
                 ) {
                     Text(
                         text = reel.animeTag,
-                        color = Color.White,
+                        color = AmoledBlack,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
@@ -265,11 +263,11 @@ fun ReelPlayerItem(
             )
             Spacer(modifier = Modifier.height(8.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.MusicNote, contentDescription = null, tint = AccentGold, modifier = Modifier.size(16.dp))
+                Icon(Icons.Default.MusicNote, contentDescription = null, tint = CyberBlue, modifier = Modifier.size(16.dp))
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     text = reel.soundTitle,
-                    color = AccentGold,
+                    color = CyberBlue,
                     fontSize = 12.sp
                 )
             }

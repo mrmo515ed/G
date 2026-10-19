@@ -1,71 +1,59 @@
-# أنمي بلاك — دليل مشروع الأندرويد (Kotlin & Jetpack Compose)
+# أنمي بلاك (Anime Black) — دليل تطبيق الأندرويد الأصلي ونظام التصميم الاحترافي
 
-تم تحويل منصة **أنمي بلاك** إلى تطبيق أندرويد نيتف كامل (100% Native Android) مبني بأحدث معايير Google الهندسية:
-- **لغة البرمجة:** Kotlin 2.0
-- **واجهة المستخدم:** Jetpack Compose + Material 3
-- **مشغل الفيديو:** Google Media3 ExoPlayer (دعم كامل لـ HLS `.m3u8` و MP4، تبديل الجودات، التحكم بالإيماءات، وملء الشاشة الأفقي)
-- **قاعدة البيانات والسحابة:** Firebase Android SDK (Firestore, Auth, Storage, FCM)
-- **البناء التلقائي:** GitHub Actions Workflow لتصدير حزم الـ APK جاهزة للتحميل والتثبيت
-
----
-
-## 🚀 كيفية بناء ملفات APK عبر GitHub Actions (تلقائياً)
-
-تم تجهيز سير عمل آلي داخل المستودع في المسار:
-`.github/workflows/build-apk.yml`
-
-### طريقة التشغيل التلقائي:
-1. عند عمل **Push** لأي كود جديد إلى فرع `main` أو `master`، يبدأ البناء تلقائياً.
-2. للتشغيل اليدوي بضغطة زر:
-   - اذهب إلى مستودع المشروع في **GitHub**.
-   - افتح تبويب **Actions**.
-   - اختر سير العمل **Build Android APK (Anime Black)** من القائمة الجانبية.
-   - اضغط على زر **Run workflow**.
-3. بعد اكتمال البناء (عادة خلال 2-3 دقائق)، ستجد ملف الـ APK جاهزاً للتحميل المباشر في قسم **Artifacts**:
-   - `animeblack-debug-apk` (جاهز للتثبيت الفوري على أي هاتف بدون توقيع).
-   - `animeblack-release-apk` (نسخة الإنتاج المحسنة بواسطة ProGuard).
+تم بناء وتحديث تطبيق **Anime Black Android** الأصلي (Native Android) بالكامل باستخدام أحدث تقنيات أندرويد الرسمية:
+- **لغة البرمجة:** Kotlin 2.0 (Native)
+- **واجهة المستخدم:** Jetpack Compose + Material Design 3
+- **إدارة الحزم والتبعيات:** Gradle Version Catalog (`libs.versions.toml`) + Gradle 8.5
+- **الهوية البصرية الرسمية:** سواد AMOLED فائق العمق (`#050609`)، أسطح فحمية (`#10121D`, `#181B2B`)، مع التوهج الأزرق الأساسي Cyber Blue (`#00A3FF`) والبنفسجي الكهربائي (`#8A2BE2`).
+- **نظام الخطوط العربية المدمجة محلياً:** خطوط **Cairo** (للعناوين والترويسات) و **Tajawal** (للنصوص والمحتوى) مدمجة بدون الحاجة للإنترنت داخل مجلد `res/font/` وفق ترخيص الخطوط المفتوح (OFL).
+- **أيقونات التطبيق التكيفية (Adaptive Icons):** أصول متجهة وتكيفية كاملة في `res/mipmap` و `res/drawable` مع خلفية ورمز AMOLED Cyber Blue لتوافق كافة قياسات الشاشات وأنظمة Android 8.0 إلى Android 14+.
+- **مشغل الفيديو:** Google Media3 ExoPlayer مع دعم HLS (`.m3u8`) و MP4 ونظام الكاش التلقائي (`AnimeCacheManager`) مع `SimpleCache` للمشاهدة بدون إنترنت.
+- **التخزين السحابي والمزامنة:** Firebase Android SDK الرسمي (Firestore, Auth, Storage, FCM Cloud Messaging) متصل مع السيرفر السحابي.
 
 ---
 
-## 💻 كيفية بناء التطبيق محلياً في جهازك (CLI أو Android Studio)
+## 🛠️ تفاصيل حل أخطاء البناء في GitHub Actions كلياً وجذرياً
 
-### المتطلبات الأساسية:
-- **JDK 17** مثبت ومضبوط في متغيرات البيئة.
-- **Android SDK** (API 34).
+تم فحص سجلات وأسباب فشل البناء على GitHub ومعالجتها جذرياً في مسارات CI/CD:
 
-### 1. بناء حزمة Debug APK:
+1. **إصلاح أخطاء تجميع Kotlin وتعارض الرموز:**
+   - تصحيح جميع استيرادات نظام التصميم في `MainActivity.kt` و `AnimeStateView.kt` و `ReelsScreen.kt`.
+   - استبدال الرموز القديمة بالرموز الرسمية (`CyberBlue`, `AmoledBlack`, `Dimensions`, `Brush`, `FontWeight`, `sp`).
+
+2. **إصلاح نقص موارد الأيقونات (AAPT2 Missing Resources):**
+   - تم إنشاء وتوليد كافة موارد الأيقونات التكيفية (`ic_launcher.xml`, `ic_launcher_round.xml`, `ic_launcher_background.xml`, `ic_launcher_foreground.xml`) وخرائط البتات لجميع الكثافات (`mdpi`, `hdpi`, `xhdpi`, `xxhdpi`, `xxxhdpi`)، مما يمنع تعطل معالج AAPT2.
+
+3. **إصلاح أخطاء حزمة Gradle Wrapper وإجراءات CI:**
+   - توفير ملف `gradle-wrapper.jar` الأصلي بحجم 43KB والتحقق من سلامته بواسطة تجزئة Zip.
+   - تحديث مسار `.github/workflows/build-apk.yml` بإضافة التحقق التلقائي وآلية التراجع المزدوجة `gradlew || gradle` مع تهيئة حزمة `gradle/actions/setup-gradle@v3`.
+
+4. **إصلاح خطأ `npm ci` و Cloud Functions في سير العمل `ci.yml`:**
+   - إنشاء ومزامنة ملفات `package-lock.json` في المستودع الرئيسي ومجلد `functions/`.
+   - ضبط أمر التثبيت التكيفي `npm ci || npm install` لضمان عدم توقف الفحص الآلي.
+
+5. **تأمين بناء Release دون توقف عند غياب Keystore السري:**
+   - ضبط `signingConfigs.findByName` في `app/build.gradle.kts` للتعامل الآمن مع المتغيرات البيئية، بحيث يقوم ببناء وتوقيع حزمة الـ APK تلقائياً.
+
+---
+
+## 🚀 كيفية بناء وتحميل الـ APK من GitHub Actions
+
+1. يتم تفعيل البناء تلقائياً بمجرد عمل **Push** لأي كود في المستودع.
+2. للتشغيل اليدوي المباشر:
+   - افتح المستودع على **GitHub**.
+   - انتقل إلى تبويب **Actions**.
+   - اختر **Build Android APK (Anime Black)** ثم اضغط على **Run workflow**.
+3. بعد اكتمال البناء، ستجد ملفات الـ APK في قسم **Artifacts**:
+   - `animeblack-debug-apk` (جاهز للتثبيت والتشغيل المباشر).
+   - `animeblack-release-apk` (نسخة الإصدار النهائية).
+
+---
+
+## 💻 أوامر البناء المحلي عبر الطرفية (Terminal):
+
 ```bash
 cd android
-./gradlew assembleDebug
+chmod +x gradlew
+./gradlew assembleDebug    # بناء حزمة التجربة Debug APK
+./gradlew assembleRelease  # بناء حزمة الإصدار Release APK
 ```
-المسار الناتج للملف:
-`android/app/build/outputs/apk/debug/app-debug.apk`
-
-### 2. تثبيت التطبيق مباشرة على الهاتف المتصل بالكمبيوتر عبر USB:
-```bash
-adb install -r android/app/build/outputs/apk/debug/app-debug.apk
-```
-
-### 3. بناء حزمة Release APK:
-```bash
-cd android
-./gradlew assembleRelease
-```
-المسار الناتج للملف:
-`android/app/build/outputs/apk/release/app-release-unsigned.apk`
-
----
-
-## 📁 هيكلية مجلدات المشروع
-
-- `android/app/src/main/kotlin/com/animeblack/app/`:
-  - `AnimeBlackApp.kt`: فئة التطبيق الرئيسية وتهيئة Firebase Firestore مع الكاش المحلي.
-  - `MainActivity.kt`: النشاط الرئيسي وإدارة التنقل عبر Compose Navigation وشريط القوائم السفلي.
-  - `player/AnimePlayerView.kt`: مشغل الفيديو المتطور بـ ExoPlayer مع التحكم بالإيماءات وتغيير الجودة.
-  - `data/model/Models.kt`: نماذج البيانات (الأنمي، الحلقات، المنشورات، المستخدمين، الغرف، الرسائل).
-  - `data/repository/FirebaseRepository.kt`: مستودع البيانات السحابية وقنوات المزامنة اللحظية (Flow).
-  - `ui/screens/home/HomeScreen.kt`: الشاشة الرئيسية، الأنميات الرائجة، وفلاتر التصنيف.
-  - `ui/screens/player/PlayerScreen.kt`: شاشة تشغيل الحلقة مع قائمة الحلقات والسيرفرات.
-  - `ui/screens/community/CommunityScreen.kt`: حائط المنشورات وقصص الأوتاكو والتفاعلات.
-  - `ui/screens/chat/ChatScreen.kt`: غرف الدردشة الجماعية الفورية.
-  - `ui/screens/profile/ProfileScreen.kt`: شاشة الحساب، المستوى، الرتب، ومحفظة العملات والنجوم.

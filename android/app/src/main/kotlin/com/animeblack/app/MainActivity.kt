@@ -25,10 +25,9 @@ import com.animeblack.app.ui.screens.player.PlayerScreen
 import com.animeblack.app.ui.screens.profile.ProfileScreen
 import com.animeblack.app.ui.screens.reels.ReelsScreen
 import com.animeblack.app.ui.screens.store.StoreScreen
-import com.animeblack.app.ui.theme.AccentRed
-import com.animeblack.app.ui.theme.AnimeBlackTheme
-import com.animeblack.app.ui.theme.DarkCard
-import com.animeblack.app.ui.theme.TextMuted
+import com.animeblack.app.ui.theme.*
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 
 class MainActivity : ComponentActivity() {
     private val firebaseRepository = FirebaseRepository()
@@ -64,7 +63,8 @@ class MainActivity : ComponentActivity() {
                     bottomBar = {
                         if (showBottomBar) {
                             NavigationBar(
-                                containerColor = DarkCard
+                                containerColor = DarkCharcoal,
+                                tonalElevation = Dimensions.spaceNone
                             ) {
                                 bottomNavItems.forEach { (screen, icon, label) ->
                                     val isSelected = currentRoute == screen.route
@@ -80,13 +80,13 @@ class MainActivity : ComponentActivity() {
                                             }
                                         },
                                         icon = { Icon(icon, contentDescription = label) },
-                                        label = { Text(label) },
+                                        label = { Text(label, fontSize = 11.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal) },
                                         colors = NavigationBarItemDefaults.colors(
-                                            selectedIconColor = AccentRed,
-                                            selectedTextColor = AccentRed,
+                                            selectedIconColor = CyberBlue,
+                                            selectedTextColor = CyberBlue,
                                             unselectedIconColor = TextMuted,
                                             unselectedTextColor = TextMuted,
-                                            indicatorColor = AccentRed.copy(alpha = 0.1f)
+                                            indicatorColor = CyberBlueMuted
                                         )
                                     )
                                 }

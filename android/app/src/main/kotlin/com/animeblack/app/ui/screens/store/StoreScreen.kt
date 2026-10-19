@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.animeblack.app.data.model.StoreItem
+import com.animeblack.app.ui.components.GlassCard
 import com.animeblack.app.ui.theme.*
 
 @Composable
@@ -29,8 +30,8 @@ fun StoreScreen(
         listOf(
             StoreItem(
                 id = "box_gold",
-                name = "صندوق الحظ الذهبي",
-                description = "يحتوي على بطاقات نادرة ولقب أسطوري مضمون",
+                name = "صندوق الحظ الأسطوري",
+                description = "يحتوي على بطاقات نادرة ولقب ملكي مضمون",
                 type = "box",
                 priceCoins = 300,
                 rarity = "legendary",
@@ -39,7 +40,7 @@ fun StoreScreen(
             StoreItem(
                 id = "card_sukuna",
                 name = "بطاقة سوكونا الخاصة",
-                description = "تزيد السمعة اليومية وتمنح هالة حمراء للملف الشخصي",
+                description = "تزيد السمعة اليومية وتمنح هالة زرقاء ملكية للملف الشخصي",
                 type = "card",
                 priceCoins = 150,
                 rarity = "epic",
@@ -47,12 +48,12 @@ fun StoreScreen(
             ),
             StoreItem(
                 id = "frame_fire",
-                name = "إطار اللهب المتوهج",
-                description = "إطار ناري متحرك يزين صورة حسابك في كل التعليقات",
+                name = "إطار السايبر المتوهج",
+                description = "إطار مشع يزين صورة حسابك في كل التعليقات والمحادثات",
                 type = "frame",
                 priceCoins = 200,
                 rarity = "rare",
-                icon = "🔥"
+                icon = "⚡"
             ),
             StoreItem(
                 id = "title_emperor",
@@ -74,7 +75,7 @@ fun StoreScreen(
             ),
             StoreItem(
                 id = "stars_pack",
-                name = "حزمة 50 نجمة ذهبية",
+                name = "حزمة 50 نجمة زرقاء",
                 description = "استخدم النجوم لترقية حسابك والحصول على امتيازات خاصة",
                 type = "currency",
                 priceCoins = 400,
@@ -91,8 +92,8 @@ fun StoreScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(DarkBg)
-            .padding(16.dp)
+            .background(AmoledBlack)
+            .padding(Dimensions.spaceLg)
     ) {
         // Top Header with Balances
         Row(
@@ -106,69 +107,71 @@ fun StoreScreen(
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.spaceSm)) {
                 Surface(
-                    shape = RoundedCornerShape(16.dp),
-                    color = DarkCard
+                    shape = RoundedCornerShape(Dimensions.radiusFull),
+                    color = DarkCharcoal,
+                    border = androidx.compose.foundation.BorderStroke(1.dp, DarkBorder)
                 ) {
                     Text(
                         text = "🪙 $currentCoins",
-                        color = AccentGold,
+                        color = CyberBlue,
                         fontWeight = FontWeight.Bold,
                         fontSize = 13.sp,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                        modifier = Modifier.padding(horizontal = Dimensions.spaceMd, vertical = Dimensions.spaceXs)
                     )
                 }
                 Surface(
-                    shape = RoundedCornerShape(16.dp),
-                    color = DarkCard
+                    shape = RoundedCornerShape(Dimensions.radiusFull),
+                    color = DarkCharcoal,
+                    border = androidx.compose.foundation.BorderStroke(1.dp, DarkBorder)
                 ) {
                     Text(
                         text = "⭐ $userStars",
-                        color = AccentCyan,
+                        color = ElectricPurpleLight,
                         fontWeight = FontWeight.Bold,
                         fontSize = 13.sp,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                        modifier = Modifier.padding(horizontal = Dimensions.spaceMd, vertical = Dimensions.spaceXs)
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(Dimensions.spaceLg))
 
         // Grid of Store Items
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(Dimensions.spaceMd),
+            verticalArrangement = Arrangement.spacedBy(Dimensions.spaceMd),
             modifier = Modifier.weight(1f)
         ) {
             items(items) { item ->
-                Surface(
-                    shape = RoundedCornerShape(14.dp),
-                    color = DarkCard,
-                    modifier = Modifier.clickable { selectedItemForBuy = item }
+                GlassCard(
+                    cornerRadius = Dimensions.radiusLg,
+                    borderAlpha = 0.15f,
+                    onClick = { selectedItemForBuy = item }
                 ) {
                     Column(
-                        modifier = Modifier.padding(14.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Box(
                             modifier = Modifier
                                 .size(60.dp)
-                                .clip(RoundedCornerShape(12.dp))
+                                .clip(RoundedCornerShape(Dimensions.radiusMd))
                                 .background(
                                     when (item.rarity) {
-                                        "legendary" -> AccentGold.copy(alpha = 0.2f)
-                                        "epic" -> AccentRed.copy(alpha = 0.2f)
-                                        else -> AccentCyan.copy(alpha = 0.2f)
+                                        "legendary" -> CyberBlue.copy(alpha = 0.25f)
+                                        "epic" -> ElectricPurple.copy(alpha = 0.25f)
+                                        else -> StatusSuccess.copy(alpha = 0.2f)
                                     }
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(item.icon, fontSize = 28.sp)
                         }
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(Dimensions.spaceSm))
                         Text(
                             text = item.name,
                             color = TextPrimary,
@@ -183,14 +186,15 @@ fun StoreScreen(
                             maxLines = 2,
                             lineHeight = 14.sp
                         )
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(Dimensions.spaceMd))
                         Button(
                             onClick = { selectedItemForBuy = item },
-                            colors = ButtonDefaults.buttonColors(containerColor = AccentRed),
-                            shape = RoundedCornerShape(8.dp),
-                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                            colors = ButtonDefaults.buttonColors(containerColor = CyberBlue),
+                            shape = RoundedCornerShape(Dimensions.radiusSm),
+                            contentPadding = PaddingValues(horizontal = Dimensions.spaceMd, vertical = Dimensions.spaceXs),
+                            modifier = Modifier.heightIn(min = 38.dp)
                         ) {
-                            Text("🪙 ${item.priceCoins}", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text("🪙 ${item.priceCoins}", color = AmoledBlack, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -203,28 +207,31 @@ fun StoreScreen(
         val target = selectedItemForBuy!!
         AlertDialog(
             onDismissRequest = { selectedItemForBuy = null },
-            title = { Text(target.name) },
+            containerColor = DarkCharcoal,
+            title = { Text(target.name, color = TextPrimary, fontWeight = FontWeight.Bold) },
             text = {
                 Text(
-                    "هل تود شراء ${target.name} مقابل ${target.priceCoins} عملة؟ سيتم إضافة العنصر فوراً إلى حقيبة مقتنياتك."
+                    "هل تود شراء ${target.name} مقابل ${target.priceCoins} عملة؟ سيتم إضافة العنصر فوراً إلى حقيبة مقتنياتك.",
+                    color = TextSecondary
                 )
             },
             confirmButton = {
-                TextButton(
+                Button(
                     onClick = {
                         if (currentCoins >= target.priceCoins) {
                             currentCoins -= target.priceCoins
                             onBuyItem(target)
                         }
                         selectedItemForBuy = null
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = CyberBlue)
                 ) {
-                    Text("تأكيد الشراء", color = AccentGold, fontWeight = FontWeight.Bold)
+                    Text("تأكيد الشراء", color = AmoledBlack, fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { selectedItemForBuy = null }) {
-                    Text("إلغاء")
+                    Text("إلغاء", color = TextSecondary)
                 }
             }
         )

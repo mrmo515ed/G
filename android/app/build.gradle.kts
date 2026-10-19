@@ -22,12 +22,13 @@ android {
         }
     }
 
+    val keystorePath = System.getenv("KEYSTORE_FILE")
+    val hasReleaseKeystore = keystorePath != null && file(keystorePath).exists()
+
     signingConfigs {
-        create("release") {
-            // Environment variables for CI signing
-            val keystorePath = System.getenv("KEYSTORE_FILE")
-            if (keystorePath != null && file(keystorePath).exists()) {
-                storeFile = file(keystorePath)
+        if (hasReleaseKeystore) {
+            create("release") {
+                storeFile = file(keystorePath!!)
                 storePassword = System.getenv("KEYSTORE_PASSWORD")
                 keyAlias = System.getenv("KEY_ALIAS")
                 keyPassword = System.getenv("KEY_PASSWORD")
@@ -37,17 +38,18 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
+            isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")
+            signingConfig = if (hasReleaseKeystore) signingConfigs.findByName("release") else signingConfigs.findByName("debug")
         }
         debug {
             applicationIdSuffix = ".debug"
             isDebuggable = true
+            signingConfig = signingConfigs.findByName("debug")
         }
     }
 

@@ -3,6 +3,7 @@ package com.animeblack.app.ui.screens.profile
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -12,13 +13,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.animeblack.app.data.model.User
 import com.animeblack.app.data.repository.FirebaseRepository
+import com.animeblack.app.ui.components.GlassCard
+import com.animeblack.app.ui.components.OtakuBadge
 import com.animeblack.app.ui.theme.*
 
 @Composable
@@ -49,44 +50,46 @@ fun ProfileScreen(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(DarkBg)
-            .padding(16.dp)
+            .background(AmoledBlack)
+            .padding(Dimensions.spaceLg)
     ) {
-        // User Card Header
+        // User Card Header with Glassmorphism
         item {
-            Surface(
-                shape = RoundedCornerShape(16.dp),
-                color = DarkCard,
+            GlassCard(
+                cornerRadius = Dimensions.radiusXl,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(
-                    modifier = Modifier.padding(18.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(76.dp)
+                            .size(Dimensions.avatarLg)
                             .clip(CircleShape)
-                            .background(
-                                Brush.linearGradient(listOf(AccentRed, AccentGold))
-                            ),
+                            .background(GradCyberBlue),
                         contentAlignment = Alignment.Center
                     ) {
                         Text("👑", fontSize = 34.sp)
                     }
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(Dimensions.spaceMd))
                     Text(
                         text = displayUser.name,
                         color = TextPrimary,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
-                    Text(
-                        text = "@${displayUser.username} · ${displayUser.role}",
-                        color = TextSecondary,
-                        fontSize = 12.sp
-                    )
-                    Spacer(modifier = Modifier.height(14.dp))
+                    Spacer(modifier = Modifier.height(Dimensions.space2xs))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = "@${displayUser.username}",
+                            color = TextSecondary,
+                            fontSize = 12.sp
+                        )
+                        Spacer(modifier = Modifier.width(Dimensions.spaceSm))
+                        OtakuBadge(text = displayUser.role, color = CyberBlue)
+                    }
+                    Spacer(modifier = Modifier.height(Dimensions.spaceLg))
 
                     // Level Bar
                     Column(modifier = Modifier.fillMaxWidth()) {
@@ -96,7 +99,7 @@ fun ProfileScreen(
                         ) {
                             Text(
                                 text = "المستوى ${displayUser.level}",
-                                color = AccentGold,
+                                color = CyberBlue,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -106,15 +109,15 @@ fun ProfileScreen(
                                 fontSize = 11.sp
                             )
                         }
-                        Spacer(modifier = Modifier.height(6.dp))
+                        Spacer(modifier = Modifier.height(Dimensions.spaceSm))
                         LinearProgressIndicator(
                             progress = { 0.75f },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(6.dp)
                                 .clip(RoundedCornerShape(3.dp)),
-                            color = AccentGold,
-                            trackColor = DarkSurface
+                            color = CyberBlue,
+                            trackColor = DarkSlate
                         )
                     }
                 }
@@ -123,45 +126,37 @@ fun ProfileScreen(
 
         // Wallet & Economy Badges
         item {
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(Dimensions.spaceMd))
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                horizontalArrangement = Arrangement.spacedBy(Dimensions.spaceMd)
             ) {
                 // Coins Card
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = DarkCard,
+                GlassCard(
+                    cornerRadius = Dimensions.radiusMd,
                     modifier = Modifier.weight(1f)
                 ) {
-                    Row(
-                        modifier = Modifier.padding(14.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Text("🪙", fontSize = 24.sp)
-                        Spacer(modifier = Modifier.width(10.dp))
+                        Spacer(modifier = Modifier.width(Dimensions.spaceSm))
                         Column {
                             Text("العملات", color = TextSecondary, fontSize = 11.sp)
-                            Text("${displayUser.coins}", color = AccentGold, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                            Text("${displayUser.coins}", color = CyberBlue, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                         }
                     }
                 }
 
                 // Stars Card
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = DarkCard,
+                GlassCard(
+                    cornerRadius = Dimensions.radiusMd,
                     modifier = Modifier.weight(1f)
                 ) {
-                    Row(
-                        modifier = Modifier.padding(14.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Text("⭐", fontSize = 24.sp)
-                        Spacer(modifier = Modifier.width(10.dp))
+                        Spacer(modifier = Modifier.width(Dimensions.spaceSm))
                         Column {
                             Text("النجوم", color = TextSecondary, fontSize = 11.sp)
-                            Text("${displayUser.stars}", color = AccentCyan, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                            Text("${displayUser.stars}", color = ElectricPurpleLight, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                         }
                     }
                 }
@@ -170,34 +165,33 @@ fun ProfileScreen(
 
         // Badges Section
         item {
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(Dimensions.spaceXl))
             Text(
                 text = "الأوسمة والإنجازات",
                 color = TextPrimary,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp
             )
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(Dimensions.spaceSm))
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                horizontalArrangement = Arrangement.spacedBy(Dimensions.spaceSm)
             ) {
                 listOf(
                     Triple("🏆", "صياد النخبة", "أكمل 50 حلقة"),
                     Triple("🔥", "عاشق الشونين", "شاهد 10 أنميات"),
                     Triple("⚡", "المتفوق", "نشط لمدة 30 يوم")
                 ).forEach { (icon, title, desc) ->
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = DarkCard,
+                    GlassCard(
+                        cornerRadius = Dimensions.radiusMd,
                         modifier = Modifier.weight(1f)
                     ) {
                         Column(
-                            modifier = Modifier.padding(12.dp),
+                            modifier = Modifier.fillMaxWidth(),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(icon, fontSize = 26.sp)
-                            Spacer(modifier = Modifier.height(6.dp))
+                            Spacer(modifier = Modifier.height(Dimensions.spaceXs))
                             Text(title, color = TextPrimary, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                             Text(desc, color = TextMuted, fontSize = 9.sp, maxLines = 1)
                         }
@@ -208,14 +202,14 @@ fun ProfileScreen(
 
         // Settings / Account Options
         item {
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(Dimensions.spaceXl))
             Text(
                 text = "إعدادات الحساب والتطبيق",
                 color = TextPrimary,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp
             )
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(Dimensions.spaceSm))
         }
 
         items(listOf(
@@ -224,19 +218,20 @@ fun ProfileScreen(
             Pair("الأجهزة والجلسات النشطة", Icons.Default.Devices),
             Pair("سياسة الخصوصية وشروط الاستخدام", Icons.Default.Security)
         )) { (label, icon) ->
-            Surface(
-                shape = RoundedCornerShape(10.dp),
-                color = DarkCard,
+            GlassCard(
+                cornerRadius = Dimensions.radiusMd,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 4.dp)
+                    .padding(vertical = Dimensions.spaceXs)
             ) {
                 Row(
-                    modifier = Modifier.padding(14.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = Dimensions.minTouchTarget),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(icon, contentDescription = null, tint = AccentGold, modifier = Modifier.size(20.dp))
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Icon(icon, contentDescription = null, tint = CyberBlue, modifier = Modifier.size(20.dp))
+                    Spacer(modifier = Modifier.width(Dimensions.spaceMd))
                     Text(label, color = TextPrimary, fontSize = 13.sp, modifier = Modifier.weight(1f))
                     Icon(Icons.Default.ChevronLeft, contentDescription = null, tint = TextMuted)
                 }
